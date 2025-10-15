@@ -13,11 +13,23 @@ export async function POST(req: NextRequest) {
       
       // Verificar el webhook con Svix
       const webhook = new Webhook(process.env.CLERK_WEBHOOK_SECRET!);
+      interface ClerkUserCreatedEvent {
+        type: string;
+        data: {
+          id: string;
+          first_name?: string;
+          last_name?: string;
+          email_addresses?: Array<{ email_address: string }>;
+          // Puedes agregar más campos según la estructura que recibes.
+        };
+        // Otros campos posibles en el webhook pueden configurarse aquí
+      }
+
       const evt = webhook.verify(payload, {
         'svix-id': headers.get('svix-id')!,
         'svix-timestamp': headers.get('svix-timestamp')!,
         'svix-signature': headers.get('svix-signature')!,
-      }) as any;
+      }) as ClerkUserCreatedEvent;
       
       // Debug: Log completo del evento
       console.log('=== WEBHOOK EVENT RECEIVED ===');
