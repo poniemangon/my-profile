@@ -2,8 +2,8 @@ import { createServiceClient } from "@/lib/supabase/server";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
-export default async function PublicProfile({ params }: { params: { 'url-slug': string } }) {
-    const { 'url-slug': urlSlug } = params;
+export default async function PublicProfile({ params }: { params: Promise<{ 'url-slug': string }> }) {
+    const { 'url-slug': urlSlug } = await params;
 
 
     const supabase = createServiceClient();
