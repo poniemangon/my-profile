@@ -1,5 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/server";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
@@ -9,7 +8,7 @@ export default async function PublicProfile({ params }: { params: { 'url-slug': 
 
     const supabase = createServiceClient();
     const { data: userProfile, error } = await supabase.from("user_profiles").select("*").eq("url_slug", urlSlug).single();
-    if (!userProfile) {
+    if (!userProfile || error) {
         redirect("/");
     }
     return (
