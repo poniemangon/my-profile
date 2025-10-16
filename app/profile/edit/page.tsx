@@ -43,39 +43,50 @@ export default function EditProfile() {
         fetchUserProfile();
     }, [user?.id]);
 
-    const [urlSlug, setUrlSlug] = useState("");
 
-    async function handleSubmit(formData: FormData) {
-        const slug = formData.get("url_slug") as string;
-      
-        if (!slug) {
+
+    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        const formData = new FormData(event.target as HTMLFormElement);
+        const urlSlug = formData.get("url_slug") as string;
+        if (!urlSlug) {
           toast.error("El slug no puede estar vacío");
           return;
         }
       
        const response = await fetch("/api/change-slug", {
         method: "POST",
-        body: JSON.stringify({ url_slug: slug }),
+        body: JSON.stringify({ url_slug: urlSlug }),
        });
        const data = await response.json();
        if (response.ok) {
         toast.success(data.message);
-        setPlaceholderSlug(slug);
+        setPlaceholderSlug(urlSlug);
        } else {
         toast.error(data.error);
        }
       }
-      
       
 
     return (
         <div>
             <h1>Edit Profile{userProfile?.email}</h1>
             <div className="form-wrapper">
-                <Form action={handleSubmit} className="flex gap-3">
-                    <input type="text" name="url_slug" className="p-1 px-2 rounded-lg mt-5 border shadow-md border-sky-500" placeholder={placeholderSlug}/>
-                    <button type="submit" className="p-1 hover:bg-black px-2 rounded-lg mt-5 bg-sky-500 text-white shadow-md ">Cambiar Slug</button>
-                </Form>
+            <form onSubmit={handleSubmit} className="flex gap-3">
+                <input
+                    type="text"
+                    name="url_slug"
+                    className="p-1 px-2 rounded-lg mt-5 border shadow-md border-sky-500"
+                    placeholder={placeholderSlug}
+                    defaultValue={placeholderSlug}
+                />
+                <button
+                    type="submit"
+                    className="p-1 hover:bg-black px-2 rounded-lg mt-5 bg-sky-500 text-white shadow-md"
+                >
+                    Cambiar Slug
+                </button>
+                </form>
             </div>
         </div>
     )
