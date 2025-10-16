@@ -3,7 +3,7 @@ import { createServiceClient } from "../supabase/server";
 
 export async function generateAndSaveQRCode(urlSlug: string) {
   // Generar QR como buffer
-  const qrBuffer = await QRCode.toBuffer(urlSlug);
+  const qrBuffer = await QRCode.toBuffer(process.env.NEXT_PUBLIC_BASE_URL + '/' + urlSlug);
 
   // Subir el QR generado al bucket de supabase
   const supabase = createServiceClient();

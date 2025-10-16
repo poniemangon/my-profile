@@ -1,10 +1,6 @@
 import { createServiceClient } from './server';
 
-/**
- * Busca un perfil de usuario por su Clerk ID
- * @param clerkId - El ID de Clerk del usuario
- * @returns El perfil del usuario o null si no se encuentra
- */
+// Server functions (use createServiceClient - bypasses RLS)
 export async function getUserProfile(clerkId: string) {
   const supabase = createServiceClient();
   
@@ -22,21 +18,27 @@ export async function getUserProfile(clerkId: string) {
   return data;
 }
 
-/**
- * Obtiene todos los perfiles de usuario
- * @returns Array de todos los perfiles de usuario
- */
-export async function getAllUserProfiles() {
+export async function updateSlug(clerkId: string, urlSlug: string) {
   const supabase = createServiceClient();
-  
+  const existingSlug = await supabase.from('user_profiles').select('url_slug').eq('url_slug', urlSlug).single();
+  if (existingSlug) {
+    return {error: 'Slug already exists'};
+  }
   const { data, error } = await supabase
     .from('user_profiles')
-    .select('*');
+    .update({ url_slug: urlSlug })
+    .eq('clerk_id', clerkId)
+    .single();
 
   if (error) {
-    console.error('Error fetching user profiles:', error);
-    return [];
+    console.error('Error updating user profile:', error);
+    return null;
   }
 
   return data;
 }
+
+// Client functions (use createClient - respects RLS)
+
+
+

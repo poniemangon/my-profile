@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
         if (existingSlug) {
           userData.url_slug = userData.url_slug + '-' + '1';
         }
-        const qrCode = await generateAndSaveQRCode(process.env.NEXT_PUBLIC_BASE_URL + '/' + userData.url_slug);
+        const qrCode = await generateAndSaveQRCode(userData.url_slug);
         userData.qr_code = qrCode;
         console.log('📝 Inserting user data:', userData);
         
