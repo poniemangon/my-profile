@@ -4,7 +4,6 @@ import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Form from 'next/form';
 import { toast } from "sonner";
 
 
