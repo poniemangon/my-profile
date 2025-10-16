@@ -37,10 +37,10 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Slug existente" }, { status: 409 });
         }
         
-        
+        const newSlug = url_slug.toLowerCase().replace(/\s+/g, '-');
         const { data, error } = await supabase
         .from("user_profiles")
-        .update({ url_slug: url_slug })
+        .update({ url_slug: newSlug })
         .eq("clerk_id", userId).select();
         if (error) {
             return NextResponse.json({ error: "Error al actualizar" }, { status: 500 });
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
         if (removeError) {
             NextResponse.json({ error: "Error al eliminar el QR code" }, { status: 500 });
         }
-        const qrCode = await generateAndSaveQRCode(url_slug);
+        const qrCode = await generateAndSaveQRCode(newSlug);
         const { error: updateError } = await supabase
         .from("user_profiles")
         .update({ qr_code: qrCode })
