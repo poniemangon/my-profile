@@ -47,12 +47,13 @@ export async function POST(req: NextRequest) {
         }
         const oldQrCode = data[0]?.qr_code;
         // Elimina toda la url del qr code excepto el nombre del archivo
-        
+        const parts = oldQrCode?.split('/');
+        const fileName = parts?.[parts.length - 1];
         const { data: removeError } = await supabase.storage
         .from("qr-codes") // nombre del bucket
-        .remove([oldQrCode?.split("/qr-codes/")[1]]); // ruta(s) exacta(s) dentro del bucket
+        .remove([fileName]); // ruta(s) exacta(s) dentro del bucket
         if (removeError) {
-            return NextResponse.json({ error: "Error al eliminar el QR code" }, { status: 500 });
+            NextResponse.json({ error: "Error al eliminar el QR code" }, { status: 500 });
         }
         const qrCode = await generateAndSaveQRCode(url_slug);
         const { error: updateError } = await supabase

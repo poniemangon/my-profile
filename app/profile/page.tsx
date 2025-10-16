@@ -13,6 +13,11 @@ export default async function Profile() {
 
     const userProfile = await getUserProfile(userId);
 
+   
+
+    
+
+
   return (
     <div className="container">
         <h1>Profile</h1>
