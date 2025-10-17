@@ -13,9 +13,11 @@ const Marker = dynamic(() => import("react-leaflet").then((mod) => mod.Marker), 
 // CSS is now imported globally in globals.css
 
 // Import L solo en el cliente
-let L: any = null;
+let L: typeof import("leaflet") | null = null;
 if (typeof window !== "undefined") {
-  L = require("leaflet");
+  import("leaflet").then((leaflet) => {
+    L = leaflet.default;
+  });
 }
 
 type Link = {
@@ -48,7 +50,7 @@ export default function LinkDetailsPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedClick, setSelectedClick] = useState<Click | null>(null);
-  const mapRef = useRef<any>(null);
+  const mapRef = useRef<L.Map | null>(null);
 
   useEffect(() => {
     async function fetchLink() {
@@ -63,7 +65,7 @@ export default function LinkDetailsPage() {
         } else {
           setError(result.error || "No se pudo cargar el link.");
         }
-      } catch (err) {
+      } catch {
         setError("Error al cargar el link.");
       } finally {
         setLoading(false);
