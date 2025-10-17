@@ -35,12 +35,12 @@ export async function POST(req: NextRequest) {
         .insert({ type, user_profile_id: userProfile.id, redirect_url: url, qr_code: '-' })
         .select()
         .single();
-        console.log('llegue aca');
+
         if(error) {
             console.log('error aca');
             return NextResponse.json({ error: "Error al crear link" }, { status: 500 });
         }
-        const qrCode = await generateAndSaveQRCode(data.id);
+        const qrCode = await generateAndSaveQRCode('/redirect?redirect_id=' + data.id);
         console.log('llegue aca 2');
         const { error: updateQRCodeError } = await supabase
         .from('user_links')
