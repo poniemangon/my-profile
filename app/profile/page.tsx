@@ -45,54 +45,66 @@ export default async function Profile() {
                 <p><strong>Profile:</strong> {userProfile.first_name} {userProfile.last_name}</p>
                 <p><strong>QR Code:</strong> <Image src={profileQr?.qr_code || ''} alt="QR Code" width={100} height={100} /></p>
                 <Link href="/profile/edit">Editar URL del perfil</Link>
-            {userProfile.links && userProfile.links.filter((link: UserLink) => link.type !== 'profile').length > 0 ? (
-                <div className="mt-8">
-                    <h2 className="text-xl font-semibold mb-4">Tus Links</h2>
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full bg-white rounded-lg shadow border border-gray-200">
-                            <thead>
-                                <tr className="bg-gradient-to-r from-blue-100 to-cyan-100">
-                                    <th className="px-4 py-2 text-left text-gray-700 font-medium">Tipo</th>
-                                    <th className="px-4 py-2 text-left text-gray-700 font-medium">URL</th>
-                                    <th className="px-4 py-2 text-left text-gray-700 font-medium">QR</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {userProfile.links.filter((link: UserLink) => link.type !== 'profile').map((link: UserLink) => (
-                                    <tr key={link.id} className="border-t hover:bg-blue-50">
-                                        <td className="px-4 py-2 capitalize">{link.type}</td>
-                                        <td className="px-4 py-2 break-all">
-                                            <a
-                                                href={link.redirect_url}
-                                                className="text-blue-600 hover:underline"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                            >
-                                                {link.redirect_url}
-                                            </a>
-                                        </td>
-                                        <td className="px-4 py-2">
+            <div className="mt-8">
+                <h2 className="text-xl font-semibold mb-4">Tus Links</h2>
+                
+                {userProfile.links && userProfile.links.filter((link: UserLink) => link.type !== 'profile').length > 0 ? (
+                    <div className="max-h-48 overflow-y-auto border rounded-lg bg-white shadow">
+                        <div className="flex flex-col">
+                            {userProfile.links.filter((link: UserLink) => link.type !== 'profile').map((link: UserLink) => (
+                                <Link
+                                    key={link.id}
+                                    href={`/profile/link/${link.id}`}
+                                    className="p-4 border-b hover:bg-blue-50 transition-colors cursor-pointer"
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-3">
+                                                <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full capitalize">
+                                                    {link.type}
+                                                </span>
+                                                <span className="text-sm text-gray-600 break-all">
+                                                    {link.redirect_url}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="ml-4">
                                             {link.qr_code ? (
                                                 <Image
                                                     src={link.qr_code}
                                                     alt="QR Code"
-                                                    width={50}
-                                                    height={50}
+                                                    width={40}
+                                                    height={40}
                                                     className="rounded border"
                                                 />
                                             ) : (
-                                                <span className="text-gray-400">-</span>
+                                                <span className="text-gray-400 text-xs">Sin QR</span>
                                             )}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
                     </div>
+                ) : (
+                    <div className="p-8 text-center text-gray-500 border rounded-lg bg-gray-50">
+                        <p className="text-lg font-medium">No tienes links asociados</p>
+                        <p className="text-sm mt-1">Agrega tu primer link para comenzar</p>
+                    </div>
+                )}
+                
+                <div className="mt-4">
+                    <Link
+                        href="/profile/add-link"
+                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        Agregar Link
+                    </Link>
                 </div>
-            ) : (
-                <p className="mt-8 text-gray-500 italic">No tenés otros links todavía.</p>
-            )}
+            </div>
             </div>
         ) : (
             <p>Profile not found</p>
