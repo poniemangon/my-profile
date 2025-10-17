@@ -38,6 +38,11 @@ export async function POST(req: NextRequest) {
         }
         
         const newSlug = url_slug.toLowerCase().replace(/\s+/g, '-');
+        const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+        
+        if (!slugRegex.test(url_slug)) {
+            return NextResponse.json({ error: "Slug contiene caracteres no permitidos" }, { status: 400 });
+        }
         const { data, error } = await supabase
         .from("user_profiles")
         .update({ url_slug: newSlug })
