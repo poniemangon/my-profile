@@ -1,11 +1,11 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 type Coords = { lat: number; lng: number };
 
-export default function Redirect() {
+function RedirectInner() {
   const [coords, setCoords] = useState<Coords | null>(null);
   const [ip, setIp] = useState<string | null>(null);
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
@@ -75,4 +75,12 @@ export default function Redirect() {
     </div>
   );
 
+}
+
+export default function Redirect() {
+  return (
+    <Suspense fallback={<p>Redirigiendo…</p>}>
+      <RedirectInner />
+    </Suspense>
+  );
 }
