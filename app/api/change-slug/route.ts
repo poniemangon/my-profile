@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { auth } from "@clerk/nextjs/server";
-import { generateAndSaveQRCode } from "@/lib/qr/saveqr";
+
 
 export async function POST(req: NextRequest) {
     try {
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
         if (!slugRegex.test(url_slug)) {
             return NextResponse.json({ error: "Slug contiene caracteres no permitidos" }, { status: 400 });
         }
-        const { data, error } = await supabase
+        const { error } = await supabase
         .from("user_profiles")
         .update({ url_slug: newSlug })
         .eq("clerk_id", userId).select();

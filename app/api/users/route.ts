@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
         const supabase = createServiceClient();
       
         // Crear objeto inicial sin qr_code
-        let userData = {
+        const userData = {
           clerk_id: clerkData.id,
           first_name: clerkData.first_name || '',
           last_name: clerkData.last_name || '',

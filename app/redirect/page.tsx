@@ -1,7 +1,6 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Router } from "next/router";
 import { useEffect, useState } from "react";
 
 type Coords = { lat: number; lng: number };

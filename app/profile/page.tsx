@@ -13,7 +13,7 @@ export default async function Profile() {
 
     const userProfile = await getUserProfile(userId);
 
-    const profileQr = userProfile?.links.find((link: any) => link.type === 'profile');
+    const profileQr = userProfile?.links.find((link: { type: string; qr_code: string; }) => link.type === 'profile');
 
   return (
     <div className="container">
