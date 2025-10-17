@@ -4,6 +4,26 @@ import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
+type UserLink = {
+  id: number;
+  type: string;
+  redirect_url: string;
+  qr_code: string | null;
+  user_profile_id: string;
+  created_at: string;
+};
+
+type UserProfile = {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  clerk_id: string;
+  url_slug: string;
+  created_at: string;
+  links: UserLink[];
+};
+
 export default async function Profile() {
     const { userId } = await auth();
     console.log(userId);
@@ -12,9 +32,9 @@ export default async function Profile() {
         redirect('/');
     }
 
-    const userProfile = await getUserProfile(userId);
+    const userProfile = await getUserProfile(userId) as UserProfile | null;
 
-    const profileQr = userProfile?.links.find((link: { type: string; qr_code: string; }) => link.type === 'profile');
+    const profileQr = userProfile?.links.find((link: UserLink) => link.type === 'profile');
 
   return (
     <div className="container">
@@ -25,7 +45,7 @@ export default async function Profile() {
                 <p><strong>Profile:</strong> {userProfile.first_name} {userProfile.last_name}</p>
                 <p><strong>QR Code:</strong> <Image src={profileQr?.qr_code || ''} alt="QR Code" width={100} height={100} /></p>
                 <Link href="/profile/edit">Editar URL del perfil</Link>
-            {userProfile.links && userProfile.links.filter((link: any) => link.type !== 'profile').length > 0 ? (
+            {userProfile.links && userProfile.links.filter((link: UserLink) => link.type !== 'profile').length > 0 ? (
                 <div className="mt-8">
                     <h2 className="text-xl font-semibold mb-4">Tus Links</h2>
                     <div className="overflow-x-auto">
@@ -38,7 +58,7 @@ export default async function Profile() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {userProfile.links.filter((link: any) => link.type !== 'profile').map((link: any) => (
+                                {userProfile.links.filter((link: UserLink) => link.type !== 'profile').map((link: UserLink) => (
                                     <tr key={link.id} className="border-t hover:bg-blue-50">
                                         <td className="px-4 py-2 capitalize">{link.type}</td>
                                         <td className="px-4 py-2 break-all">
