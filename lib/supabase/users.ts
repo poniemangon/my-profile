@@ -4,29 +4,31 @@ import { createServiceClient } from './server';
 export async function getUserProfile(clerkId: string) {
   const supabase = createServiceClient();
   
-  const { data, error } = await supabase
+  const { data: profileData, error: profileError } = await supabase
     .from('user_profiles')
     .select('*')
     .eq('clerk_id', clerkId)
     .single();
 
+
+
   const { data: links, error: linksError } = await supabase
     .from('user_links')
     .select('*')
-    .eq('user_profile_id', data.id);
+    .eq('user_profile_id', profileData.id);
 
   if (linksError) {
     console.error('Error fetching links (client):', linksError);
     return null;
   }
-  data.links = links;
+  profileData.links = links;
 
-  if (error) {
-    console.error('Error fetching user profile:', error);
+  if (profileError) {
+    console.error('Error fetching user profile:', profileError);
     return null;
   }
 
-  return data;
+  return profileData;
 }
 
 export async function updateSlug(clerkId: string, urlSlug: string) {

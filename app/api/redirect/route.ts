@@ -11,9 +11,10 @@ export async function POST(request: NextRequest) {
         const supabase = createServiceClient();
         const { data, error } = await supabase
         .from("user_links")
-        .select("redirect_url")
+        .select("*")
         .eq("id", redirectId)
         .single();
+
 
         
         if(!data) {
@@ -22,7 +23,19 @@ export async function POST(request: NextRequest) {
         if (error) {
             return NextResponse.json({ error: "Error al obtener URL de redirección" }, { status: 500 });
         }
-
+        if(data.type === 'profile') {
+            const { data: userProfile, error: userProfileError } = await supabase
+            .from("user_profiles")
+            .select("*")
+            .eq("id", data.user_profile_id)
+            .single();
+            if(userProfileError) {
+                return NextResponse.json({ error: "Error al obtener usuario" }, { status: 500 });
+            }
+            const redirectUrl = '/' + userProfile.url_slug;
+            return NextResponse.json({ redirectUrl: redirectUrl }, { status: 200 });
+        }
+        
         if(body.ip && body.coords) {
             const {  error } = await supabase
             .from("link_clicks")

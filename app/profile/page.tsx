@@ -6,6 +6,7 @@ import Link from "next/link";
 
 export default async function Profile() {
     const { userId } = await auth();
+    console.log(userId);
     
     if (!userId) {
         redirect('/');

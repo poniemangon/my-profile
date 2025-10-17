@@ -34,8 +34,7 @@ export async function POST(req: NextRequest) {
       // Debug: Log completo del evento
       console.log('=== WEBHOOK EVENT RECEIVED ===');
       console.log('Event type:', evt.type);
-      console.log('Event data:', JSON.stringify(evt, null, 2));
-      console.log('================================');
+
       
       // Verificar que el evento sea de creación de usuario
       if (evt.type === 'user.created') {
@@ -54,19 +53,15 @@ export async function POST(req: NextRequest) {
         };
       
         // Verificar si el slug ya existe
-        const { data: existingSlugData, error: slugError } = await supabase
+        const { data: existingSlug } = await supabase
           .from('user_profiles')
           .select('url_slug')
           .eq('url_slug', userData.url_slug)
           .single();
       
-        if (slugError && slugError.code !== '23505') {
-          // PGRST116 = not found, es normal si no existe
-          console.error('Error checking slug:', slugError);
-          return new Response('Error checking slug', { status: 500 });
-        }
+
       
-        if (existingSlugData) {
+        if (existingSlug) {
           userData.url_slug += '-1';
         }
       
@@ -82,21 +77,35 @@ export async function POST(req: NextRequest) {
           return new Response('Error inserting user', { status: 500 });
         }
       
-        // Generar QR usando el ID real de Supabase
-        const qrCode = await generateAndSaveQRCode(insertedUser.id);
+       
       
         // Actualizar el registro con el QR generado
-        const { error: insertQRCodeError } = await supabase
+        const { data: insertedLink, error: insertLinkError } = await supabase
           .from('user_links')
           .insert({
             user_profile_id: insertedUser.id,
-            qr_code: qrCode,
+            qr_code: '-',
             redirect_url: process.env.NEXT_PUBLIC_BASE_URL + '/' + insertedUser.id,
             type: 'profile'
-          })
+          }).select().single();
+
+          
+    
+
+        if(insertedLink) {
+          const qrCode = await generateAndSaveQRCode('/redirect?redirect_id=' + insertedLink.id);
+          const { error: updateLinkError } = await supabase
+          .from('user_links')
+          .update({ qr_code: qrCode })
+          .eq('id', insertedLink.id);
+          if(updateLinkError) {
+            console.error('❌ Error updating QR code:', updateLinkError);
+            return new Response('Error updating QR code', { status: 500 });
+          }
+        }
       
-        if (insertQRCodeError) {
-          console.error('❌ Error updating QR code:', insertQRCodeError);
+        if (insertLinkError) {
+          console.error('❌ Error updating QR code:', insertLinkError);
           return new Response('Error updating QR code', { status: 500 });
         }
       
