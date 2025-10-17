@@ -19,21 +19,35 @@ export async function POST(req: NextRequest) {
         if(!type) {
             return NextResponse.json({ error: "Tipo invalido" }, { status: 400 });
         }
+
+
+        const{data: userProfile, error: userProfileError} = await supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('clerk_id', userId)
+        .single();
+        if(userProfileError) {
+            return NextResponse.json({ error: "Error al obtener usuario" }, { status: 500 });
+        }
         
         const { data, error } = await supabase
         .from('user_links')
-        .insert({ type, user_profile_id: userId, redirect_url: url, qr_code: '-' })
+        .insert({ type, user_profile_id: userProfile.id, redirect_url: url, qr_code: '-' })
         .select()
         .single();
+        console.log('llegue aca');
         if(error) {
+            console.log('error aca');
             return NextResponse.json({ error: "Error al crear link" }, { status: 500 });
         }
         const qrCode = await generateAndSaveQRCode(data.id);
+        console.log('llegue aca 2');
         const { error: updateQRCodeError } = await supabase
         .from('user_links')
         .update({ qr_code: qrCode })
         .eq('id', data.id);
         if(updateQRCodeError) {
+            console.log('llegue aca 3 error');
             return NextResponse.json({ error: "Error al actualizar QR code" }, { status: 500 });
         }
         return NextResponse.json({ data: data.id }); 
