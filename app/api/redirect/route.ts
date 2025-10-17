@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
         }
 
         if(body.ip && body.coords) {
-            const { data, error } = await supabase
+            const {  error } = await supabase
             .from("link_clicks")
             .insert({
                 ip_address: ip,
