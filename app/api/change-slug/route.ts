@@ -37,10 +37,15 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Slug existente" }, { status: 409 });
         }
         
+        const newSlug = url_slug.toLowerCase().replace(/\s+/g, '-');
+        const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
         
+        if (!slugRegex.test(url_slug)) {
+            return NextResponse.json({ error: "Slug contiene caracteres no permitidos" }, { status: 400 });
+        }
         const { data, error } = await supabase
         .from("user_profiles")
-        .update({ url_slug: url_slug })
+        .update({ url_slug: newSlug })
         .eq("clerk_id", userId).select();
         if (error) {
             return NextResponse.json({ error: "Error al actualizar" }, { status: 500 });
