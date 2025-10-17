@@ -205,7 +205,7 @@ export default function LinkDetailsPage() {
                       <Marker
                         key={click.id}
                         position={[click.lat!, click.lng!]}
-                        icon={L.divIcon({
+                        icon={L?.divIcon({
                           className: `bg-black rounded-full ${selectedClick?.id === click.id ? 'ring-2 ring-blue-500' : ''}`,
                           html: '<div style="width:10px;height:10px;background:#000;border-radius:50%"></div>',
                           iconSize: [10, 10],
