@@ -16,9 +16,8 @@ type UserProfile = {
   created_at: string;
 };
 
-export default function EditProfile() {
+export default function AddLink() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [placeholderSlug, setPlaceholderSlug] = useState("");
   const { isLoaded, isSignedIn, user } = useUser();
   const router = useRouter();
 
@@ -42,7 +41,6 @@ export default function EditProfile() {
           console.error("Error fetching user profile:", error);
         } else {
           setUserProfile(data);
-          setPlaceholderSlug(data.url_slug);
         }
       }
     }
@@ -52,44 +50,55 @@ export default function EditProfile() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const urlSlug = formData.get("url_slug") as string;
+    const url = formData.get("url") as string;
+    const type = formData.get("type") as string;
 
-    if (!urlSlug) {
-      toast.error("El slug no puede estar vacío");
+    if (!url) {
+      toast.error("La URL no puede estar vacía");
+      return;
+    }
+    if (!type) {
+      toast.error("El tipo no puede estar vacío");
       return;
     }
 
-    const response = await fetch("/api/change-slug", {
+    const response = await fetch("/api/links", {
       method: "POST",
-      body: JSON.stringify({ url_slug: urlSlug }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url, type }),
     });
 
     const data = await response.json();
     if (response.ok) {
-      toast.success(data.message);
-      setPlaceholderSlug(urlSlug);
+      toast.success("Link agregado correctamente");
+      // Optionally clear the form or redirect, as needed
     } else {
-      toast.error(data.error);
+      toast.error(data.error || "Error al agregar el link");
     }
   }
 
   return (
     <div>
-      <h1>Edit Profile {userProfile?.email}</h1>
+      <h1>Agregar Link {userProfile?.email}</h1>
       <div className="form-wrapper">
-        <form onSubmit={handleSubmit} className="flex gap-3">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 max-w-md">
+          <input
+            type="url"
+            name="url"
+            className="p-1 px-2 rounded-lg mt-5 border shadow-md border-sky-500"
+            placeholder="https://tusitio.com"
+          />
           <input
             type="text"
-            name="url_slug"
-            className="p-1 px-2 rounded-lg mt-5 border shadow-md border-sky-500"
-            placeholder={placeholderSlug}
-            defaultValue={placeholderSlug}
+            name="type"
+            className="p-1 px-2 rounded-lg border shadow-md border-sky-500"
+            placeholder="Tipo de enlace (ej: portfolio, github, etc)"
           />
           <button
             type="submit"
-            className="p-1 hover:bg-black px-2 rounded-lg mt-5 bg-sky-500 text-white shadow-md"
+            className="p-1 hover:bg-black px-2 rounded-lg bg-sky-500 text-white shadow-md"
           >
-            Cambiar Slug
+            Agregar Link
           </button>
         </form>
       </div>

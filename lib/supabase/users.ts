@@ -10,6 +10,17 @@ export async function getUserProfile(clerkId: string) {
     .eq('clerk_id', clerkId)
     .single();
 
+  const { data: links, error: linksError } = await supabase
+    .from('user_links')
+    .select('*')
+    .eq('user_profile_id', data.id);
+
+  if (linksError) {
+    console.error('Error fetching links (client):', linksError);
+    return null;
+  }
+  data.links = links;
+
   if (error) {
     console.error('Error fetching user profile:', error);
     return null;

@@ -13,6 +13,8 @@ export default async function Profile() {
 
     const userProfile = await getUserProfile(userId);
 
+    const profileQr = userProfile?.links.find((link: any) => link.type === 'profile');
+
   return (
     <div className="container">
         <h1>Profile</h1>
@@ -20,7 +22,7 @@ export default async function Profile() {
             <div>                
                 <p><strong>Email:</strong> {userProfile.email}</p>
                 <p><strong>Profile:</strong> {userProfile.first_name} {userProfile.last_name}</p>
-                <p><strong>QR Code:</strong> <Image src={userProfile.qr_code} alt="QR Code" width={100} height={100} /></p>
+                <p><strong>QR Code:</strong> <Image src={profileQr?.qr_code || ''} alt="QR Code" width={100} height={100} /></p>
                 <Link href="/profile/edit">Editar URL del perfil</Link>
             </div>
         ) : (
